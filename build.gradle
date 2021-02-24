@@ -7,8 +7,8 @@ import de.undercouch.gradle.tasks.download.Download
 File tmpFolder = new File("/tmp/gretl-share")
 def pathToTempFolder = tmpFolder.getAbsolutePath()
 
-//def landUsePlansDataSets = ["2401", "2403", "2405", "2407", "2408", "2421", "2455", "2456", "2457", "2473", "2474", "2475", "2476", "2479",  "2491", "2492", "2498", "2501", "2502", "2514", "2541", "2546", "2548", "2551", "2573", "2574", "2475", "2580", "2581", "2582", "2586", "2613", "2614", "2615", "2616", "2617", "2617", "2621",  "2622"]
-def landUsePlansDataSets = ["2401"]
+def landUsePlansDataSets = ["2401", "2403", "2405", "2407", "2408", "2421", "2455", "2456", "2457", "2473", "2474", "2475", "2476", "2479",  "2491", "2492", "2498", "2501", "2502", "2514", "2541", "2546", "2548", "2551", "2573", "2574", "2575", "2580", "2581", "2582", "2586", "2613", "2614", "2615", "2616", "2617", "2621",  "2622"]
+//def landUsePlansDataSets = ["2401", "2403", "2405", "2407", "2408", "2421", "2455", "2456", "2457", "2473", "2474", "2475", "2476", "2479",  "2491", "2492", "2498"]
 def landUsePlansBaseUrl = "https://geo.so.ch/geodata/ch.so.arp.nutzungsplanung/"
 
 def iliModelLandUsePlans = "SO_Nutzungsplanung_20171118"
@@ -79,6 +79,9 @@ task exportMgdmLandUsePlans(type: Ili2pgExport) {
     disableValidation = true
 }
 
-task validataLandUsePlansMgdm(type: Ilivalidator) {
-
+task validataLandUsePlansMgdm(type: IliValidator) {
+    dataFiles = [file("Hauptnutzung_CH_V1_1.xml"), file("ch.so.arp.npl.mgdm.xtf")]
+    logFile = "ilivalidator.log"
+    allObjectsAccessible = true
+    configFile = "config.toml"
 }

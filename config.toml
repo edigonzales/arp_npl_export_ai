@@ -1,3 +1,4 @@
 ["PARAMETER"]
+#defaultGeometryTypeValidation="off"
 areaOverlapValidation="off"
 

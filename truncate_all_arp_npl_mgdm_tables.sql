@@ -1,6 +1,6 @@
-DELETE FROM arp_npl_mgdm.geobasisdaten_ueberlagernde_festlegung
-;
 DELETE FROM arp_npl_mgdm.geobasisdaten_grundnutzung_zonenflaeche
+;
+DELETE FROM arp_npl_mgdm.geobasisdaten_ueberlagernde_festlegung
 ;
 DELETE FROM arp_npl_mgdm.geobasisdaten_linienbezogene_festlegung
 ;
