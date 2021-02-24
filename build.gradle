@@ -1,0 +1,84 @@
+import ch.so.agi.gretl.api.TransferSet
+import ch.so.agi.gretl.tasks.*
+import java.nio.file.Paths
+import de.undercouch.gradle.tasks.download.Download
+
+//def pathToTempFolder = System.getProperty("java.io.tmpdir")
+File tmpFolder = new File("/tmp/gretl-share")
+def pathToTempFolder = tmpFolder.getAbsolutePath()
+
+//def landUsePlansDataSets = ["2401", "2403", "2405", "2407", "2408", "2421", "2455", "2456", "2457", "2473", "2474", "2475", "2476", "2479",  "2491", "2492", "2498", "2501", "2502", "2514", "2541", "2546", "2548", "2551", "2573", "2574", "2475", "2580", "2581", "2582", "2586", "2613", "2614", "2615", "2616", "2617", "2617", "2621",  "2622"]
+def landUsePlansDataSets = ["2401"]
+def landUsePlansBaseUrl = "https://geo.so.ch/geodata/ch.so.arp.nutzungsplanung/"
+
+def iliModelLandUsePlans = "SO_Nutzungsplanung_20171118"
+def dbSchemaLandUsePlans = "arp_npl"
+
+def iliModelMgdmHauptnutzung = "Nutzungsplanung_Hauptnutzung_V1_1"
+def iliModelMgdmLandUsePlans = "Nutzungsplanung_LV95_V1_1"
+def dbSchemaMgdmLandUsePlans = "arp_npl_mgdm"
+
+task createSchemaLandUsePlans(type: SqlExecutor){
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['arp_npl.sql']
+}
+
+landUsePlansDataSets.each { landUsePlansDataSet ->
+    def dataSet = landUsePlansDataSet.toString()
+    task "downloadDataLandUsePlans_$dataSet"(type: Download) {
+        src landUsePlansBaseUrl + dataSet + ".xtf"
+        dest pathToTempFolder
+        overwrite true
+
+        doLast {
+            println "File downloaded to: " + pathToTempFolder
+        }        
+    }
+
+    task "replaceDataLandUsePlans_$dataSet"(type: Ili2pgReplace, dependsOn: "downloadDataLandUsePlans_$dataSet") {
+        database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+        models = iliModelLandUsePlans
+        dbschema = dbSchemaLandUsePlans
+        dataFile = file(Paths.get(pathToTempFolder.toString(), dataSet + ".xtf"))
+        dataset = dataSet
+        disableValidation = true
+    }
+}
+
+task replaceDataLandUsePlans() {
+    dependsOn {
+        tasks.findAll { task -> task.name.startsWith('replaceDataLandUsePlans_') }
+    }
+}
+
+task createMgdmSchemaLandUsePlans(type: SqlExecutor) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['arp_npl_mgdm.sql']
+}
+
+task importHauptnutzung(type: Ili2pgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelMgdmHauptnutzung
+    dbschema = dbSchemaMgdmLandUsePlans
+    dataFile = file("Hauptnutzung_CH_V1_1.xml")
+    disableValidation = true
+}
+
+//
+// TODO
+//
+
+task removeMgdmLandUsePlans(type: SqlExecutor) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['truncate_all_arp_npl_mgdm_tables.sql']
+}
+
+
+
+task exportMgdmLandUsePlans(type: Ili2pgExport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelMgdmLandUsePlans
+    dbschema = dbSchemaMgdmLandUsePlans
+    dataFile = file("ch.so.arp.npl.mgdm.xtf")
+    disableValidation = true
+}
