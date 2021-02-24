@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS arp_npl_mgdm;
-CREATE SEQUENCE arp_npl_mgdm.t_ili2db_seq;;
+CREATE SEQUENCE arp_npl_mgdm.t_ili2db_seq MINVALUE 1000000000000;;
 -- Nutzungsplanung_Hauptnutzung_V1_1.Hauptnutzung_CH.Hauptnutzung_CH
 CREATE TABLE arp_npl_mgdm.hauptnutzung_ch_hauptnutzung_ch (
   T_Id bigint PRIMARY KEY DEFAULT nextval('arp_npl_mgdm.t_ili2db_seq')
@@ -193,7 +193,16 @@ CREATE TABLE arp_npl_mgdm.T_ILI2DB_MODEL (
   ,PRIMARY KEY (iliversion,modelName)
 )
 ;
-CREATE TABLE arp_npl_mgdm.rechtsstatus (
+CREATE TABLE arp_npl_mgdm.chcantoncode (
+  itfCode integer PRIMARY KEY
+  ,iliCode varchar(1024) NOT NULL
+  ,seq integer NULL
+  ,inactive boolean NOT NULL
+  ,dispName varchar(250) NOT NULL
+  ,description varchar(1024) NULL
+)
+;
+CREATE TABLE arp_npl_mgdm.verbindlichkeit (
   itfCode integer PRIMARY KEY
   ,iliCode varchar(1024) NOT NULL
   ,seq integer NULL
@@ -211,16 +220,7 @@ CREATE TABLE arp_npl_mgdm.languagecode_iso639_1 (
   ,description varchar(1024) NULL
 )
 ;
-CREATE TABLE arp_npl_mgdm.chcantoncode (
-  itfCode integer PRIMARY KEY
-  ,iliCode varchar(1024) NOT NULL
-  ,seq integer NULL
-  ,inactive boolean NOT NULL
-  ,dispName varchar(250) NOT NULL
-  ,description varchar(1024) NULL
-)
-;
-CREATE TABLE arp_npl_mgdm.verbindlichkeit (
+CREATE TABLE arp_npl_mgdm.rechtsstatus (
   itfCode integer PRIMARY KEY
   ,iliCode varchar(1024) NOT NULL
   ,seq integer NULL
@@ -391,28 +391,58 @@ INSERT INTO arp_npl_mgdm.T_ILI2DB_TRAFO (iliname,tag,setting) VALUES ('Nutzungsp
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TRAFO (iliname,tag,setting) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Grundnutzung_Zonenflaeche','ch.ehi.ili2db.inheritance','newClass');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TRAFO (iliname,tag,setting) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Objektbezogene_Festlegung','ch.ehi.ili2db.inheritance','newClass');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TRAFO (iliname,tag,setting) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.Amt','ch.ehi.ili2db.inheritance','newClass');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_Hauptnutzung_V1_1.Hauptnutzung_CH.Hauptnutzung_CH',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.zustStelle_Daten',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Dokument',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Grundnutzung_Zonenflaeche','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.Datenbestand',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Ueberlagernde_Festlegung','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.Amt',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.HinweisWeitereDokumente',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Typ_Kt',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.MultilingualUri',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.Rechtsvorschrift','Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.Dokument');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Kt',NULL);
 INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Objektbezogene_Festlegung','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.Dokument',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.Rechtsvorschrift','Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.Dokument');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.TypKt_HauptnCH',NULL);
-INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Linienbezogene_Festlegung','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Geometrie',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Ueberlagernde_Festlegung','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.Amt',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Typ_Kt',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.Datenbestand',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Typ_Dokument',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Grundnutzung_Zonenflaeche','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.TypKt_HauptnCH',NULL);
 INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.LocalisedUri',NULL);
-INSERT INTO arp_npl_mgdm.rechtsstatus (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'inKraft',0,'inKraft',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.rechtsstatus (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'laufendeAenderung',1,'laufendeAenderung',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_Hauptnutzung_V1_1.Hauptnutzung_CH.Hauptnutzung_CH',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.TransferMetadaten.zustStelle_Daten',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Rechtsvorschriften.HinweisWeitereDokumente',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.MultilingualUri',NULL);
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Linienbezogene_Festlegung','Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie');
+INSERT INTO arp_npl_mgdm.T_ILI2DB_INHERITANCE (thisClass,baseClass) VALUES ('Nutzungsplanung_LV95_V1_1.Geobasisdaten.Geometrie',NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'ZH',0,'ZH',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BE',1,'BE',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'LU',2,'LU',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'UR',3,'UR',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SZ',4,'SZ',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'OW',5,'OW',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'NW',6,'NW',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GL',7,'GL',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'ZG',8,'ZG',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'FR',9,'FR',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SO',10,'SO',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BS',11,'BS',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BL',12,'BL',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SH',13,'SH',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AR',14,'AR',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AI',15,'AI',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SG',16,'SG',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GR',17,'GR',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AG',18,'AG',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'TG',19,'TG',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'TI',20,'TI',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'VD',21,'VD',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'VS',22,'VS',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'NE',23,'NE',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GE',24,'GE',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'JU',25,'JU',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'FL',26,'FL',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'CH',27,'CH',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'Nutzungsplanfestlegung',0,'Nutzungsplanfestlegung',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'orientierend',1,'orientierend',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'hinweisend',2,'hinweisend',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'wegleitend',3,'wegleitend',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'de',0,'de',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'fr',1,'fr',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'it',2,'it',FALSE,NULL);
@@ -552,38 +582,8 @@ INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,ina
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'za',136,'za',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'zh',137,'zh',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'zu',138,'zu',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'ZH',0,'ZH',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BE',1,'BE',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'LU',2,'LU',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'UR',3,'UR',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SZ',4,'SZ',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'OW',5,'OW',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'NW',6,'NW',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GL',7,'GL',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'ZG',8,'ZG',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'FR',9,'FR',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SO',10,'SO',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BS',11,'BS',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'BL',12,'BL',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SH',13,'SH',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AR',14,'AR',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AI',15,'AI',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'SG',16,'SG',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GR',17,'GR',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'AG',18,'AG',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'TG',19,'TG',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'TI',20,'TI',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'VD',21,'VD',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'VS',22,'VS',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'NE',23,'NE',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'GE',24,'GE',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'JU',25,'JU',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'FL',26,'FL',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.chcantoncode (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'CH',27,'CH',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'Nutzungsplanfestlegung',0,'Nutzungsplanfestlegung',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'orientierend',1,'orientierend',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'hinweisend',2,'hinweisend',FALSE,NULL);
-INSERT INTO arp_npl_mgdm.verbindlichkeit (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'wegleitend',3,'wegleitend',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.rechtsstatus (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'inKraft',0,'inKraft',FALSE,NULL);
+INSERT INTO arp_npl_mgdm.rechtsstatus (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'laufendeAenderung',1,'laufendeAenderung',FALSE,NULL);
 INSERT INTO arp_npl_mgdm.T_ILI2DB_COLUMN_PROP (tablename,subtype,columnname,tag,setting) VALUES ('localiseduri',NULL,'multilingualuri_localisedtext','ch.ehi.ili2db.foreignKey','multilingualuri');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_COLUMN_PROP (tablename,subtype,columnname,tag,setting) VALUES ('rechtsvorschrften_dokument',NULL,'T_Type','ch.ehi.ili2db.types','["rechtsvorschrften_dokument","rechtsvorschrften_rechtsvorschrift"]');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_COLUMN_PROP (tablename,subtype,columnname,tag,setting) VALUES ('geobasisdaten_grundnutzung_zonenflaeche',NULL,'typ','ch.ehi.ili2db.foreignKey','geobasisdaten_typ');
@@ -638,11 +638,11 @@ INSERT INTO arp_npl_mgdm.T_ILI2DB_COLUMN_PROP (tablename,subtype,columnname,tag,
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('geobasisdaten_ueberlagernde_festlegung','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('localiseduri','ch.ehi.ili2db.tableKind','STRUCTURE');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('rechtsstatus','ch.ehi.ili2db.tableKind','ENUM');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('geobasisdaten_linienbezogene_festlegung','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('geobasisdaten_objektbezogene_festlegung','ch.ehi.ili2db.tableKind','CLASS');
+INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('geobasisdaten_linienbezogene_festlegung','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('multilingualuri','ch.ehi.ili2db.tableKind','STRUCTURE');
-INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('rechtsvorschrften_dokument','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('transfermetadaten_datenbestand','ch.ehi.ili2db.tableKind','CLASS');
+INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('rechtsvorschrften_dokument','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('rechtsvorschrften_hinweisweiteredokumente','ch.ehi.ili2db.tableKind','ASSOCIATION');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('geobasisdaten_typ_kt','ch.ehi.ili2db.tableKind','CLASS');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_TABLE_PROP (tablename,tag,setting) VALUES ('transfermetadaten_amt','ch.ehi.ili2db.tableKind','CLASS');
@@ -750,7 +750,7 @@ CONTRACTED TYPE MODEL Units (en) AT "http://www.interlis.ch/models"
 
 END Units.
 
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_MODEL (filename,iliversion,modelName,content,importDate) VALUES ('Nutzungsplanung_V1_1.ili','2.3','Nutzungsplanung_Hauptnutzung_V1_1 Nutzungsplanung_LV03_V1_1{ CHAdminCodes_V1 InternationalCodes_V1 GeometryCHLV03_V1 Nutzungsplanung_Hauptnutzung_V1_1} Nutzungsplanung_LV95_V1_1{ GeometryCHLV95_V1 CHAdminCodes_V1 InternationalCodes_V1 Nutzungsplanung_Hauptnutzung_V1_1}','INTERLIS 2.3;
 
 /** Minimales Geodatenmodell
@@ -1122,7 +1122,7 @@ VERSION "2019-08-09"  =
   END TransferMetadaten;
 
 END Nutzungsplanung_LV95_V1_1.
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_MODEL (filename,iliversion,modelName,content,importDate) VALUES ('CoordSys-20151124.ili','2.3','CoordSys','!! File CoordSys.ili Release 2015-11-24
 
 INTERLIS 2.3;
@@ -1337,7 +1337,7 @@ REFSYSTEM MODEL CoordSys (en) AT "http://www.interlis.ch/models"
 
 END CoordSys.
 
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_MODEL (filename,iliversion,modelName,content,importDate) VALUES ('CHBase_Part2_LOCALISATION_V1.ili','2.3','InternationalCodes_V1 Localisation_V1{ InternationalCodes_V1} LocalisationCH_V1{ InternationalCodes_V1 Localisation_V1} Dictionaries_V1{ InternationalCodes_V1} DictionariesCH_V1{ InternationalCodes_V1 Dictionaries_V1}','/* ########################################################################
    CHBASE - BASE MODULES OF THE SWISS FEDERATION FOR MINIMAL GEODATA MODELS
    ======
@@ -1509,7 +1509,7 @@ MODEL DictionariesCH_V1 (en)
 END DictionariesCH_V1.
 
 !! ########################################################################
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_MODEL (filename,iliversion,modelName,content,importDate) VALUES ('CHBase_Part4_ADMINISTRATIVEUNITS_V1.ili','2.3','CHAdminCodes_V1 AdministrativeUnits_V1{ CHAdminCodes_V1 InternationalCodes_V1 Dictionaries_V1 Localisation_V1 INTERLIS} AdministrativeUnitsCH_V1{ CHAdminCodes_V1 InternationalCodes_V1 LocalisationCH_V1 AdministrativeUnits_V1 INTERLIS}','/* ########################################################################
    CHBASE - BASE MODULES OF THE SWISS FEDERATION FOR MINIMAL GEODATA MODELS
    ======
@@ -1731,7 +1731,7 @@ MODEL AdministrativeUnitsCH_V1 (en)
 END AdministrativeUnitsCH_V1.
 
 !! ########################################################################
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_MODEL (filename,iliversion,modelName,content,importDate) VALUES ('CHBase_Part1_GEOMETRY_V1.ili','2.3','GeometryCHLV03_V1{ CoordSys Units INTERLIS} GeometryCHLV95_V1{ CoordSys Units INTERLIS}','/* ########################################################################
    CHBASE - BASE MODULES OF THE SWISS FEDERATION FOR MINIMAL GEODATA MODELS
    ======
@@ -1909,7 +1909,7 @@ TYPE MODEL GeometryCHLV95_V1 (en)
 END GeometryCHLV95_V1.
 
 !! ########################################################################
-','2021-02-24 08:58:46.358');
+','2021-02-24 10:42:39.627');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_SETTINGS (tag,setting) VALUES ('ch.ehi.ili2db.createMetaInfo','True');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_SETTINGS (tag,setting) VALUES ('ch.ehi.ili2db.beautifyEnumDispName','underscore');
 INSERT INTO arp_npl_mgdm.T_ILI2DB_SETTINGS (tag,setting) VALUES ('ch.ehi.ili2db.arrayTrafo','coalesce');
