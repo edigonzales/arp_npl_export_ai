@@ -64,15 +64,12 @@ task importHauptnutzung(type: Ili2pgImport) {
     disableValidation = true
 }
 
-//
-// TODO
-//
+// GRETL-Job begins here...
 
-task removeMgdmLandUsePlans(type: SqlExecutor) {
+task transferLandUsePlansData(type: SqlExecutor) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
-    sqlFiles = ['truncate_all_arp_npl_mgdm_tables.sql']
+    sqlFiles = ['truncate_all_arp_npl_mgdm_tables.sql', 'arp_nutzungsplanung_mgdm.sql']
 }
-
 
 task exportMgdmLandUsePlans(type: Ili2pgExport) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
@@ -80,4 +77,8 @@ task exportMgdmLandUsePlans(type: Ili2pgExport) {
     dbschema = dbSchemaMgdmLandUsePlans
     dataFile = file("ch.so.arp.npl.mgdm.xtf")
     disableValidation = true
+}
+
+task validataLandUsePlansMgdm(type: Ilivalidator) {
+
 }
