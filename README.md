@@ -1,5 +1,22 @@
 # arp_npl_export_ai
 
+## Laerm
+
+```
+java -jar /Users/stefan/apps/ili2pg-4.3.1/ili2pg-4.3.1.jar \
+--dbschema arp_laermempfindlichkeitsstufen_mgdm --models Laermempfindlichkeitsstufen_LV95_V1_1 \
+--defaultSrsCode 2056 --createGeomIdx --createFk --createFkIdx --createUnique --createEnumTabs --beautifyEnumDispName --createMetaInfo --createNumChecks --nameByTopic --strokeArcs \
+--idSeqMin 1000000000000 \
+--createscript arp_laermempfindlichkeitsstufen_mgdm.sql
+```
+
+
+
+
+
+
+## NPL
+
 ```
 java -jar /Users/stefan/apps/ili2pg-4.3.1/ili2pg-4.3.1.jar \
 --dbschema arp_npl --models SO_Nutzungsplanung_20171118 \
