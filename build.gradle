@@ -17,6 +17,10 @@ def dbSchemaLandUsePlans = "arp_npl"
 def iliModelMgdmHauptnutzung = "Nutzungsplanung_Hauptnutzung_V1_1"
 def iliModelMgdmLandUsePlans = "Nutzungsplanung_LV95_V1_1"
 def dbSchemaMgdmLandUsePlans = "arp_npl_mgdm"
+def mgdmLandUsePlansXtfFileName = "ch.so.arp.npl.mgdm.xtf"
+def mgdmLandUsePlansZipFileName = "ch.so.arp.npl.mgdm.zip"
+
+def aiLogin = aiUser + ":" + aiPwd
 
 task createSchemaLandUsePlans(type: SqlExecutor){
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
@@ -71,17 +75,38 @@ task transferLandUsePlansData(type: SqlExecutor) {
     sqlFiles = ['truncate_all_arp_npl_mgdm_tables.sql', 'arp_nutzungsplanung_mgdm.sql']
 }
 
-task exportMgdmLandUsePlans(type: Ili2pgExport) {
+task exportMgdmLandUsePlans(type: Ili2pgExport, dependsOn: 'transferLandUsePlansData') {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     models = iliModelMgdmLandUsePlans
     dbschema = dbSchemaMgdmLandUsePlans
-    dataFile = file("ch.so.arp.npl.mgdm.xtf")
+    dataFile = file(mgdmLandUsePlansXtfFileName)
     disableValidation = true
 }
 
-task validataLandUsePlansMgdm(type: IliValidator) {
-    dataFiles = [file("Hauptnutzung_CH_V1_1.xml"), file("ch.so.arp.npl.mgdm.xtf")]
+task validataMgdmLandUsePlans(type: IliValidator, dependsOn: 'exportMgdmLandUsePlans') {
+    dataFiles = [file("Hauptnutzung_CH_V1_1.xml"), file(mgdmLandUsePlansXtfFileName)]
     logFile = "ilivalidator.log"
     allObjectsAccessible = true
     configFile = "config.toml"
+    failOnError = false
+}
+
+task zipMgdmLandUsePlans(type: Zip, dependsOn: 'validataMgdmLandUsePlans'){
+    from pathToTempFolder
+    from "."
+    include mgdmLandUsePlansXtfFileName
+    include "config.toml"
+    archiveName mgdmLandUsePlansZipFileName
+    destinationDir(file(pathToTempFolder))
+}
+
+//task uploadMgdmLandUsePlans(dependsOn: 'zipMgdmLandUsePlans') {
+task uploadMgdmLandUsePlans() {
+    doLast {
+        def response = ["curl", "-u", aiLogin, "-F", "topic=npl_nutzungsplanung", "-F",
+                        "lv95_file=@" + Paths.get(pathToTempFolder.toString(), mgdmLandUsePlansZipFileName), "-F", "publish=true",
+                        "https://" + aiServer + "/data_agg/interlis/import"].execute().text
+        println(response)
+    }
+    //finalizedBy 'removeNplchFiles'
 }
