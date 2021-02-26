@@ -167,12 +167,14 @@ task zipMgdmNoiseSensitivityLevels(type: Zip, dependsOn: 'validateMgdmNoiseSensi
 }
 
 task uploadMgdmNoiseSensitivityLevels(dependsOn: 'zipMgdmNoiseSensitivityLevels') {
-//task uploadMgdmNoiseSensitivityLevels() {
     doLast {
         def response = ["curl", "-u", aiLogin, "-F", "topic=npl_laermempfindlichkeitsstufen", "-F",
                         "lv95_file=@" + Paths.get(pathToTempFolder.toString(), mgdmSensitivityLevelsZipFileName), "-F", "publish=true",
                         "https://" + aiServer + "/data_agg/interlis/import"].execute().text
         println(response)
+        if (response.contains("false")) {
+            throw new GradleException()
+        }
     }
 }
 
@@ -209,7 +211,6 @@ task zipMgdmLandUsePlans(type: Zip, dependsOn: 'validateMgdmLandUsePlans'){
 }
 
 task uploadMgdmLandUsePlans(dependsOn: 'zipMgdmLandUsePlans') {
-//task uploadMgdmLandUsePlans() {
     doLast {
         def response = ["curl", "-u", aiLogin, "-F", "topic=npl_nutzungsplanung", "-F",
                         "lv95_file=@" + Paths.get(pathToTempFolder.toString(), mgdmLandUsePlansZipFileName), "-F", "publish=true",
