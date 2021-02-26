@@ -72,14 +72,6 @@ task createMgdmSchemaLandUsePlans(type: SqlExecutor) {
     sqlFiles = ['schema/arp_npl_mgdm.sql']
 }
 
-task importHauptnutzung(type: Ili2pgImport) {
-    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
-    models = iliModelMgdmHauptnutzung
-    dbschema = dbSchemaMgdmLandUsePlans
-    dataFile = file("Hauptnutzung_CH_V1_1.xml")
-    disableValidation = true
-}
-
 task createMgdmSchemaNoiseSensitivityLevels(type: SqlExecutor) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     sqlFiles = ['schema/arp_laermempfindlichkeitsstufen_mgdm.sql']
@@ -180,7 +172,15 @@ task uploadMgdmNoiseSensitivityLevels(dependsOn: 'zipMgdmNoiseSensitivityLevels'
 
 // NPL
 
-task transferLandUsePlansData(type: SqlExecutor) {
+task importMgdmHauptnutzung(type: Ili2pgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelMgdmHauptnutzung
+    dbschema = dbSchemaMgdmLandUsePlans
+    dataFile = file("Hauptnutzung_CH_V1_1.xml")
+    disableValidation = true
+}
+
+task transferLandUsePlansData(type: SqlExecutor, dependsOn: 'importMgdmHauptnutzung') {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     sqlFiles = ['truncate_all_arp_npl_mgdm_tables.sql', 'arp_nutzungsplanung_mgdm.sql']
 }

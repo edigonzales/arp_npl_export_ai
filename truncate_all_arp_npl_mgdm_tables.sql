@@ -20,3 +20,5 @@ DELETE FROM arp_npl_mgdm.multilingualuri
 ;
 DELETE FROM arp_npl_mgdm.rechtsvorschrften_dokument
 ;
+DELETE FROM arp_npl_mgdm.hauptnutzung_ch_hauptnutzung_ch
+;
