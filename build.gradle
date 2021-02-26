@@ -26,6 +26,11 @@ def dbSchemaMgdmSensitivityLevels = "arp_laermempfindlichkeitsstufen_mgdm"
 def mgdmSensitivityLevelsXtfFileName = "ch.so.arp.laerm.mgdm.xtf"
 def mgdmSensitivityLevelsZipFileName = "ch.so.arp.laerm.mgdm.zip"
 
+def iliModelMgdmWaldabstand = "Waldabstandslinien_LV95_V1_1"
+def dbSchemaWaldabstand = "arp_waldabstandslinien_mgdm"
+def mgdmWaldabstandXtfFileName = "ch.so.arp.waldabstand.mgdm.xtf"
+def mgdmWaldabstandZipFileName = "ch.so.arp.waldabstand.mgdm.zip"
+
 
 def aiLogin = aiUser + ":" + aiPwd
 
@@ -80,7 +85,55 @@ task createMgdmSchemaNoiseSensitivityLevels(type: SqlExecutor) {
     sqlFiles = ['schema/arp_laermempfindlichkeitsstufen_mgdm.sql']
 }
 
+task createMgdmWaldabstandslinien(type: SqlExecutor) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['schema/arp_waldabstandslinien_mgdm.sql']
+}
+
 // GRETL-Job begins here...
+
+// Waldabstand
+
+task transferWaldabstandslinien(type: SqlExecutor) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['truncate_all_arp_waldabstandslinien_mgdm_tables.sql', 'arp_waldabstandslinien_mgdm.sql']
+}
+
+task exportMgdmWaldabstandslinien(type: Ili2pgExport, dependsOn: 'transferWaldabstandslinien') {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelMgdmWaldabstand
+    dbschema = dbSchemaWaldabstand
+    dataFile = file(mgdmWaldabstandXtfFileName)
+    disableValidation = true
+}
+
+task validateMgdmWaldabstandslinien(type: IliValidator, dependsOn: 'exportMgdmWaldabstandslinien') {
+    dataFiles = [file(mgdmWaldabstandXtfFileName)]
+    logFile = "ilivalidator_waldabstandslinien.log"
+    configFile = "config.toml"
+    failOnError = false
+}
+
+task zipMgdmWaldabstandslinien(type: Zip, dependsOn: 'validateMgdmWaldabstandslinien'){
+    from pathToTempFolder
+    from "."
+    include mgdmWaldabstandXtfFileName
+    include "config.toml"
+    archiveName mgdmWaldabstandZipFileName
+    destinationDir(file(pathToTempFolder))
+}
+
+task uploadMgdmWaldabstandslinien(dependsOn: 'zipMgdmWaldabstandslinien') {
+    doLast {
+        def response = ["curl", "-u", aiLogin, "-F", "topic=npl_waldabstandslinien", "-F",
+                        "lv95_file=@" + Paths.get(pathToTempFolder.toString(), mgdmWaldabstandZipFileName), "-F", "publish=true",
+                        "https://" + aiServer + "/data_agg/interlis/import"].execute().text
+        println(response)
+        if (response.contains("false")) {
+            throw new GradleException()
+        }        
+    }
+}
 
 // Lärm
 
@@ -97,14 +150,14 @@ task exportMgdmNoiseSensitivityLevels(type: Ili2pgExport, dependsOn: 'transferNo
     disableValidation = true
 }
 
-task validataMgdmNoiseSensitivityLevels(type: IliValidator, dependsOn: 'exportMgdmNoiseSensitivityLevels') {
+task validateMgdmNoiseSensitivityLevels(type: IliValidator, dependsOn: 'exportMgdmNoiseSensitivityLevels') {
     dataFiles = [file(mgdmSensitivityLevelsXtfFileName)]
     logFile = "ilivalidator_noisesensitivitylevels.log"
     configFile = "config.toml"
     failOnError = false
 }
 
-task zipMgdmNoiseSensitivityLevels(type: Zip, dependsOn: 'validataMgdmNoiseSensitivityLevels'){
+task zipMgdmNoiseSensitivityLevels(type: Zip, dependsOn: 'validateMgdmNoiseSensitivityLevels'){
     from pathToTempFolder
     from "."
     include mgdmSensitivityLevelsXtfFileName
@@ -138,7 +191,7 @@ task exportMgdmLandUsePlans(type: Ili2pgExport, dependsOn: 'transferLandUsePlans
     disableValidation = true
 }
 
-task validataMgdmLandUsePlans(type: IliValidator, dependsOn: 'exportMgdmLandUsePlans') {
+task validateMgdmLandUsePlans(type: IliValidator, dependsOn: 'exportMgdmLandUsePlans') {
     dataFiles = [file("Hauptnutzung_CH_V1_1.xml"), file(mgdmLandUsePlansXtfFileName)]
     logFile = "ilivalidator_landuseplans.log"
     allObjectsAccessible = true
@@ -146,7 +199,7 @@ task validataMgdmLandUsePlans(type: IliValidator, dependsOn: 'exportMgdmLandUseP
     failOnError = false
 }
 
-task zipMgdmLandUsePlans(type: Zip, dependsOn: 'validataMgdmLandUsePlans'){
+task zipMgdmLandUsePlans(type: Zip, dependsOn: 'validateMgdmLandUsePlans'){
     from pathToTempFolder
     from "."
     include mgdmLandUsePlansXtfFileName
@@ -155,12 +208,15 @@ task zipMgdmLandUsePlans(type: Zip, dependsOn: 'validataMgdmLandUsePlans'){
     destinationDir(file(pathToTempFolder))
 }
 
-//task uploadMgdmLandUsePlans(dependsOn: 'zipMgdmLandUsePlans') {
-task uploadMgdmLandUsePlans() {
+task uploadMgdmLandUsePlans(dependsOn: 'zipMgdmLandUsePlans') {
+//task uploadMgdmLandUsePlans() {
     doLast {
         def response = ["curl", "-u", aiLogin, "-F", "topic=npl_nutzungsplanung", "-F",
                         "lv95_file=@" + Paths.get(pathToTempFolder.toString(), mgdmLandUsePlansZipFileName), "-F", "publish=true",
                         "https://" + aiServer + "/data_agg/interlis/import"].execute().text
         println(response)
+        if (response.contains("false")) {
+            throw new GradleException()
+        }
     }
 }

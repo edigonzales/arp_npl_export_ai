@@ -10,8 +10,15 @@ java -jar /Users/stefan/apps/ili2pg-4.3.1/ili2pg-4.3.1.jar \
 --createscript arp_laermempfindlichkeitsstufen_mgdm.sql
 ```
 
+## Waldabstandslinien
 
-
+```
+java -jar /Users/stefan/apps/ili2pg-4.3.1/ili2pg-4.3.1.jar \
+--dbschema arp_waldabstandslinien_mgdm --models Waldabstandslinien_LV95_V1_1 \
+--defaultSrsCode 2056 --createGeomIdx --createFk --createFkIdx --createUnique --createEnumTabs --beautifyEnumDispName --createMetaInfo --createNumChecks --nameByTopic --strokeArcs \
+--idSeqMin 1000000000000 \
+--createscript schema/arp_waldabstandslinien_mgdm.sql
+```
 
 
 

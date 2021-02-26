@@ -76,6 +76,8 @@ FROM
             typ_grundnutzung
         FROM 
             arp_npl.nutzungsplanung_grundnutzung
+        WHERE 
+            t_datasetname <> '2403'
     ) AS grundnutzung
 WHERE 
     ST_Area(geometrie) > 0
@@ -200,6 +202,8 @@ FROM
             arp_npl.nutzungsplanung_ueberlagernd_flaeche AS flaeche
             JOIN arp_npl_mgdm.geobasisdaten_typ AS typ 
             ON flaeche.typ_ueberlagernd_flaeche = typ.t_id 
+        WHERE 
+            flaeche.t_datasetname <> '2403'
     ) AS flaeche
 WHERE 
     ST_Area(geometrie) > 0
@@ -284,6 +288,9 @@ FROM
             arp_npl.nutzungsplanung_ueberlagernd_linie AS linie
             JOIN arp_npl_mgdm.geobasisdaten_typ AS typ 
             ON linie.typ_ueberlagernd_linie = typ.t_id             
+        WHERE 
+            linie.t_datasetname <> '2403'
+
     ) AS foo
 -- SELECT 
 --     linie.t_id,
@@ -363,4 +370,6 @@ FROM
     arp_npl.nutzungsplanung_ueberlagernd_punkt AS punkt
     JOIN arp_npl_mgdm.geobasisdaten_typ AS typ 
     ON punkt.typ_ueberlagernd_punkt = typ.t_id 
+WHERE 
+    punkt.t_datasetname <> '2403'
 ;
