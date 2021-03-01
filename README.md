@@ -1,5 +1,7 @@
 # arp_npl_export_ai
 
+`-Dorg.gradle.jvmargs=-Xmx1G`
+
 ## Laerm
 
 ```
@@ -19,8 +21,6 @@ java -jar /Users/stefan/apps/ili2pg-4.3.1/ili2pg-4.3.1.jar \
 --idSeqMin 1000000000000 \
 --createscript schema/arp_waldabstandslinien_mgdm.sql
 ```
-
-
 
 ## NPL
 
